@@ -59,62 +59,62 @@
                  name="uploadFile"
                  accept="image/*">
         </div>
-        <ul class="h5ui-uploader_files">
-          <li class="h5ui-uploader_files_item">
-            <a>
-              <img id="imgContentImgFront"
+          <ul class="h5ui-uploader_files">
+            <li class="h5ui-uploader_files_item">
+              <a>
+                <img id="imgContentImgFront"
                    width="75px"
                    height="75px">
             </a>
-          </li>
-        </ul>
-        <div class="clearfix"></div>
-      </div>
-      <!-- </group> -->
-      <!-- <group> -->
-      <div class="h5ui-group h5ui-uploader">
-        <h5 class="h5ui-uploader_title">
-          身份证反面
-        </h5>
-        <div class="h5ui-uploader_btn">
-          <div class="h5ui-uploader_btn_border"></div>
-          <input type="file"
+            </li>
+          </ul>
+          <div class="clearfix"></div>
+        </div>
+        <!-- </group> -->
+        <!-- <group> -->
+        <div class="h5ui-group h5ui-uploader">
+          <h5 class="h5ui-uploader_title">
+            身份证反面
+          </h5>
+          <div class="h5ui-uploader_btn">
+            <div class="h5ui-uploader_btn_border"></div>
+            <input type="file"
                  @change="getFileBack"
                  name="uploadFile"
                  id="certback"
                  accept="image/*">
         </div>
-        <ul class="h5ui-uploader_files">
-          <li class="h5ui-uploader_files_item">
-            <a>
-              <img id="imgContentImgBack"
+            <ul class="h5ui-uploader_files">
+              <li class="h5ui-uploader_files_item">
+                <a>
+                  <img id="imgContentImgBack"
                    width="75px"
                    height="75px">
             </a>
-          </li>
-        </ul>
-        <div class="clearfix"></div>
-      </div>
-      <!-- </group> -->
-      <group>
-        <x-textarea title="描述"
-                    placeholder="请填写描述"
-                    :show-counter="false"
-                    required
-                    should-toast-error
-                    v-model="description"
-                    :rows="3"></x-textarea>
-      </group>
-      <flexbox style="margin:20px 0px">
-        <flexbox-item>
-        </flexbox-item>
-        <flexbox-item>
-          <x-button type="primary"
-                    @click.native="submit">确定</x-button>
-        </flexbox-item>
-        <flexbox-item>
-        </flexbox-item>
-      </flexbox>
+              </li>
+            </ul>
+            <div class="clearfix"></div>
+          </div>
+          <!-- </group> -->
+          <group>
+            <x-textarea title="描述"
+                        placeholder="请填写描述"
+                        :show-counter="false"
+                        required
+                        should-toast-error
+                        v-model="description"
+                        :rows="3"></x-textarea>
+          </group>
+          <flexbox style="margin:20px 0px">
+            <flexbox-item>
+            </flexbox-item>
+            <flexbox-item>
+              <x-button type="primary"
+                        @click.native="submit">确定</x-button>
+            </flexbox-item>
+            <flexbox-item>
+            </flexbox-item>
+          </flexbox>
     </group>
     <toast v-model="showPositionValue"
            type="text"
@@ -140,6 +140,8 @@ export default {
       channel: '',
       cnum: '',
       description: '',
+      frontTrue: false,
+      backTrue: false,
       front: {},
       back: {},
       position: 'default',
@@ -204,7 +206,15 @@ export default {
           //false
         })
       }
-      this.readFileFront()
+      this.frontTrue = this.verificationPicFile(files[0])
+      if (this.frontTrue) {
+        console.log(this.frontTrue)
+        this.readFileFront()
+      } else {
+        this.position = 'middle'
+        this.showPositionValue = true
+        this.text = '图片大小不能大于2M！'
+      }
     },
     getFileBack (e) {
       e.preventDefault()
@@ -228,7 +238,16 @@ export default {
           //false
         })
       }
-      this.readFileBack()
+      this.backTrue = this.verificationPicFile(files[0])
+      console.log(this.backTrue)
+      if (this.backTrue) {
+        console.log(this.backTrue)
+        this.readFileBack()
+      } else {
+        this.position = 'middle'
+        this.showPositionValue = true
+        this.text = '图片大小不能大于2M！'
+      }
     },
     submit () {
       if (this.username === '') {
@@ -329,7 +348,30 @@ export default {
         this.showPositionValue = true
         this.text = '服务异常'
       })
+    },
+    //图片大小验证
+    verificationPicFile (file) {
+      var fileSize = 0
+      var fileMaxSize = 2048
+      console.log(file)
+      var filePath = file.path
+      if (filePath) {
+        fileSize = file.size
+        var size = fileSize / 1024
+        if (size > fileMaxSize) {
+          file.value = ''
+          return false
+        } else if (size <= 0) {
+          file.value = ''
+          return false
+        } else {
+          return true
+        }
+      } else {
+        return false
+      }
     }
+
   }
 }
 </script>
