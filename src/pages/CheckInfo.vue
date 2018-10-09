@@ -33,14 +33,33 @@
                label-width="5"
                disabled
                :value="auditList.cnum"></x-input>
-      <card :header="{title: title}">
+      <div class="h5ui-group h5ui-uploader">
+        <h5 class="h5ui-uploader_title">
+          身份证正反面
+        </h5>
+        <ul class="h5ui-uploader_files"
+            v-for="(item, index) in list"
+            :key="index">
+          <li class="h5ui-uploader_files_item">
+            <a>
+              <img slot="header"
+                   width="75px"
+                   height="75px"
+                   :src="item.src"
+                   @click="show(index)">
+            </a>
+          </li>
+        </ul>
+        <div class="clearfix"></div>
+      </div>
+      <!-- <card :header="{title: title}">
         <img slot="header"
              v-for="(item, index) in list"
              :key="index"
              :src="item.src"
-             style="width:100px;display:block;float:left"
+             style="padding:15px;width:75px;height:75px;display:block;float:left"
              @click="show(index)">
-      </card>
+      </card> -->
       <x-textarea title="描述"
                   :show-counter="false"
                   disabled
@@ -113,10 +132,10 @@ export default {
         console.log(res)
         this.auditList = res
         let front = {
-          src: `C:/wenwen/fujian/${this.auditList.front.path}`
+          src: `/image/${this.auditList.front.path}`
         }
         let back = {
-          src: `C:/wenwen/fujian/${this.auditList.back.path}`
+          src: `/image/${this.auditList.back.path}`
         }
         this.list.push(front)
         this.list.push(back)
