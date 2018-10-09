@@ -57,14 +57,14 @@
                  id="certfront"
                  @change="getFileFront"
                  name="uploadFile"
-                 accept="image/jpeg,image/png,image/bmp">
+                 accept="image/*">
         </div>
         <ul class="h5ui-uploader_files">
           <li class="h5ui-uploader_files_item">
             <a>
               <img id="imgContentImgFront"
-                   width="100%"
-                   height="100%">
+                   width="75px"
+                   height="75px">
             </a>
           </li>
         </ul>
@@ -82,14 +82,14 @@
                  @change="getFileBack"
                  name="uploadFile"
                  id="certback"
-                 accept="image/jpeg,image/png,image/bmp">
+                 accept="image/*">
         </div>
         <ul class="h5ui-uploader_files">
           <li class="h5ui-uploader_files_item">
             <a>
               <img id="imgContentImgBack"
-                   width="100%"
-                   height="100%">
+                   width="75px"
+                   height="75px">
             </a>
           </li>
         </ul>
@@ -182,13 +182,52 @@ export default {
         }
     },
     getFileFront (e) {
-      console.log("e", e.target.files[0])
-      this.front = e.target.files[0]
+      e.preventDefault()
+      let files
+      if (e.dataTransfer) {
+        files = e.dataTransfer.files
+      } else if (e.target) {
+        files = e.target.files
+      }
+      const reader = new FileReader()
+      reader.readAsDataURL(files[0])
+      this.front = files[0]
+      console.log(this.front)
+      if (files[0].type == '') {
+        // 第一个参数支持单类型，或多类型，多类型时用竖线分隔，用于生成正则式
+        checkFileType('(png|jpg|jpeg|mp4|mov|m4v|ogg)', file, function (fileType) {
+          console.log(fileType)
+          //'png'
+        })
+        checkFileType('jpg', file, function (fileType) {
+          console.log(fileType)
+          //false
+        })
+      }
       this.readFileFront()
     },
     getFileBack (e) {
-      console.log("e", e.target.files[0].path)
-      this.back = e.target.files[0]
+      e.preventDefault()
+      let files
+      if (e.dataTransfer) {
+        files = e.dataTransfer.files
+      } else if (e.target) {
+        files = e.target.files
+      }
+      const reader = new FileReader()
+      reader.readAsDataURL(files[0])
+      this.back = files[0]
+      if (files[0].type == '') {
+        // 第一个参数支持单类型，或多类型，多类型时用竖线分隔，用于生成正则式
+        checkFileType('(png|jpg|jpeg|mp4|mov|m4v|ogg)', file, function (fileType) {
+          console.log(fileType)
+          //'png'
+        })
+        checkFileType('jpg', file, function (fileType) {
+          console.log(fileType)
+          //false
+        })
+      }
       this.readFileBack()
     },
     submit () {
@@ -232,12 +271,13 @@ export default {
         this.showPositionValue = true
         this.text = '身份证号码不能为空'
         return
-      } else if (this.IdentityCodeValid(this.cnum) === false) {
-        this.position = 'middle'
-        this.showPositionValue = true
-        this.text = '身份证号格式错误'
-        return
       }
+      // else if (this.IdentityCodeValid(this.cnum) === false) {
+      //   this.position = 'middle'
+      //   this.showPositionValue = true
+      //   this.text = '身份证号格式错误'
+      //   return
+      // }
       if (this.description === '') {
         this.position = 'middle'
         this.showPositionValue = true
