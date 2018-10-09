@@ -271,13 +271,12 @@ export default {
         this.showPositionValue = true
         this.text = '身份证号码不能为空'
         return
+      } else if (this.IdentityCodeValid(this.cnum) === false) {
+        this.position = 'middle'
+        this.showPositionValue = true
+        this.text = '身份证号格式错误'
+        return
       }
-      // else if (this.IdentityCodeValid(this.cnum) === false) {
-      //   this.position = 'middle'
-      //   this.showPositionValue = true
-      //   this.text = '身份证号格式错误'
-      //   return
-      // }
       if (this.description === '') {
         this.position = 'middle'
         this.showPositionValue = true
