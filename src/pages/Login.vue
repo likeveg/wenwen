@@ -23,7 +23,10 @@
                   @click.native="login">登录</x-button>
       </flexbox-item>
     </flexbox>
-
+    <toast v-model="showPositionValue"
+           type="text"
+           :text="text"
+           width="10em"></toast>
   </div>
 </template>
 
@@ -36,7 +39,10 @@ export default {
   data () {
     return {
       username: '',
-      password: ''
+      password: '',
+      position: 'default',
+      showPositionValue: false,
+      text: ''
     }
   },
   methods: {
@@ -62,6 +68,12 @@ export default {
           console.log(data)
           this.$store.state.userid = data.data.id
           this.$router.push('Main')
+        }).catch(error => {
+          console.log(11111111111)
+          console.log(error.response.data)
+          this.position = 'middle'
+          this.showPositionValue = true
+          this.text = error.response.data.message
         })
       }
     }

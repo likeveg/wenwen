@@ -59,74 +59,74 @@
                  name="uploadFile"
                  accept="image/*">
         </div>
-          <ul class="h5ui-uploader_files">
-            <li class="h5ui-uploader_files_item">
-              <a>
-                <img id="imgContentImgFront"
+        <ul class="h5ui-uploader_files">
+          <li class="h5ui-uploader_files_item">
+            <a>
+              <img id="imgContentImgFront"
                    width="75px"
                    height="75px">
             </a>
-            </li>
-          </ul>
-          <div class="clearfix"></div>
-        </div>
-        <!-- </group> -->
-        <!-- <group> -->
-        <div class="h5ui-group h5ui-uploader">
-          <h5 class="h5ui-uploader_title">
-            身份证反面
-          </h5>
-          <div class="h5ui-uploader_btn">
-            <div class="h5ui-uploader_btn_border"></div>
-            <input type="file"
+          </li>
+        </ul>
+        <div class="clearfix"></div>
+      </div>
+      <!-- </group> -->
+      <!-- <group> -->
+      <div class="h5ui-group h5ui-uploader">
+        <h5 class="h5ui-uploader_title">
+          身份证反面
+        </h5>
+        <div class="h5ui-uploader_btn">
+          <div class="h5ui-uploader_btn_border"></div>
+          <input type="file"
                  @change="getFileBack"
                  name="uploadFile"
                  id="certback"
                  accept="image/*">
         </div>
-            <ul class="h5ui-uploader_files">
-              <li class="h5ui-uploader_files_item">
-                <a>
-                  <img id="imgContentImgBack"
+        <ul class="h5ui-uploader_files">
+          <li class="h5ui-uploader_files_item">
+            <a>
+              <img id="imgContentImgBack"
                    width="75px"
                    height="75px">
             </a>
-              </li>
-            </ul>
-            <div class="clearfix"></div>
-          </div>
-          <!-- </group> -->
-          <group>
-            <x-textarea title="描述"
-                        placeholder="请填写描述"
-                        :show-counter="false"
-                        required
-                        should-toast-error
-                        v-model="description"
-                        :rows="3"></x-textarea>
-          </group>
-          <flexbox style="margin:20px 0px">
-            <flexbox-item>
-            </flexbox-item>
-            <flexbox-item>
-              <x-button type="primary"
-                        @click.native="submit">确定</x-button>
-            </flexbox-item>
-            <flexbox-item>
-            </flexbox-item>
-          </flexbox>
+          </li>
+        </ul>
+        <div class="clearfix"></div>
+      </div>
+      <!-- </group> -->
+      <group>
+        <x-textarea title="描述"
+                    placeholder="请填写描述"
+                    :show-counter="false"
+                    required
+                    should-toast-error
+                    v-model="description"
+                    :rows="3"></x-textarea>
+      </group>
+      <flexbox style="margin:20px 0px">
+        <flexbox-item>
+        </flexbox-item>
+        <flexbox-item>
+          <x-button type="primary"
+                    @click.native="submit">确定</x-button>
+        </flexbox-item>
+        <flexbox-item>
+        </flexbox-item>
+      </flexbox>
     </group>
     <toast v-model="showPositionValue"
            type="text"
-           :text="text"></toast>
+           :text="text"
+           width="15em"></toast>
   </div>
 </template>
 
 <script>
-// 全局对象，不同function使用传递数据
-const imgFile = {}
 import Share from '@/share/index.js'
 import { excuteApis } from '@/apis'
+import canvasResize from 'canvas-resize'
 export default {
   mixins: [Share],
   data () {
@@ -184,6 +184,7 @@ export default {
         }
     },
     getFileFront (e) {
+      console.log(11111111)
       e.preventDefault()
       let files
       if (e.dataTransfer) {
@@ -193,8 +194,6 @@ export default {
       }
       const reader = new FileReader()
       reader.readAsDataURL(files[0])
-      this.front = files[0]
-      console.log(this.front)
       if (files[0].type == '') {
         // 第一个参数支持单类型，或多类型，多类型时用竖线分隔，用于生成正则式
         checkFileType('(png|jpg|jpeg|mp4|mov|m4v|ogg)', file, function (fileType) {
@@ -206,15 +205,33 @@ export default {
           //false
         })
       }
-      this.frontTrue = this.verificationPicFile(files[0])
-      if (this.frontTrue) {
-        console.log(this.frontTrue)
-        this.readFileFront()
-      } else {
-        this.position = 'middle'
-        this.showPositionValue = true
-        this.text = '图片大小不能大于2M！'
-      }
+      let file = files[0]
+      let self = this
+      canvasResize(file, {
+        crop: false, // 是否裁剪
+        quality: 0.5, // 压缩质量  0 - 1
+        rotate: 0, // 旋转角度
+        callback (baseStr) {
+          let filename = '身份证正面'
+          let arr = baseStr.split(','), mime = arr[0].match(/:(.*?);/)[1],
+            bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n)
+          while (n--) {
+            u8arr[n] = bstr.charCodeAt(n)
+          }
+          self.front = new File([u8arr], filename, { type: mime })
+          console.log(self.front)
+          self.frontTrue = self.verificationPicFile(self.front)
+          if (self.frontTrue) {
+            self.readFileFront()
+          } else {
+            self.front = {}
+            self.position = 'middle'
+            self.showPositionValue = true
+            self.text = '图片大小不能大于2M'
+            e.target.value = ''
+          }
+        }
+      })
     },
     getFileBack (e) {
       e.preventDefault()
@@ -226,7 +243,7 @@ export default {
       }
       const reader = new FileReader()
       reader.readAsDataURL(files[0])
-      this.back = files[0]
+
       if (files[0].type == '') {
         // 第一个参数支持单类型，或多类型，多类型时用竖线分隔，用于生成正则式
         checkFileType('(png|jpg|jpeg|mp4|mov|m4v|ogg)', file, function (fileType) {
@@ -238,16 +255,33 @@ export default {
           //false
         })
       }
-      this.backTrue = this.verificationPicFile(files[0])
-      console.log(this.backTrue)
-      if (this.backTrue) {
-        console.log(this.backTrue)
-        this.readFileBack()
-      } else {
-        this.position = 'middle'
-        this.showPositionValue = true
-        this.text = '图片大小不能大于2M！'
-      }
+      let file = files[0]
+      let self = this
+      canvasResize(file, {
+        crop: false, // 是否裁剪
+        quality: 0.5, // 压缩质量  0 - 1
+        rotate: 0, // 旋转角度
+        callback (baseStr) {
+          let filename = '身份证反面'
+          let arr = baseStr.split(','), mime = arr[0].match(/:(.*?);/)[1],
+            bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n)
+          while (n--) {
+            u8arr[n] = bstr.charCodeAt(n)
+          }
+          self.back = new File([u8arr], filename, { type: mime })
+          console.log(self.back)
+          self.backTrue = self.verificationPicFile(self.back)
+          if (self.backTrue) {
+            self.readFileBack()
+          } else {
+            self.back = {}
+            self.position = 'middle'
+            self.showPositionValue = true
+            self.text = '图片大小不能大于2M'
+            e.target.value = ''
+          }
+        }
+      })
     },
     submit () {
       if (this.username === '') {
@@ -343,19 +377,22 @@ export default {
         this.text = '申请成功'
         this.$router.go(-1)
       }).catch(error => {
-        console.log(error)
+        console.log(11111111111)
+        console.log(error.response.data)
         this.position = 'middle'
         this.showPositionValue = true
-        this.text = '服务异常'
+        this.text = error.response.data.message
       })
     },
     //图片大小验证
     verificationPicFile (file) {
-      var fileSize = 0
-      var fileMaxSize = 2048
+      let fileSize = 0
+      let fileMaxSize = 2048
+      let fileName = file.name
       console.log(file)
-      var filePath = file.path
-      if (filePath) {
+      console.log(222222222)
+      console.log(fileName)
+      if (fileName) {
         fileSize = file.size
         var size = fileSize / 1024
         if (size > fileMaxSize) {
@@ -371,7 +408,6 @@ export default {
         return false
       }
     }
-
   }
 }
 </script>

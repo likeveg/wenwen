@@ -144,18 +144,17 @@ export default {
       }
       excuteApis(intRequestParams, global.constant.commonApis, 'service', 'lastSeveralGross').then(data => {
         let res = data.data
-        console.log(res)
-        this.incomeData = res
+        let a = JSON.stringify(res).replace(/commission/g, '收入')
+        let b = JSON.parse(a)
+        this.incomeData = b
       })
       excuteApis(intRequestParams, global.constant.commonApis, 'service', 'lastSeveralConsumer').then(data => {
         let res = data.data
-        console.log(res)
-        this.usersData = res
+        let a = JSON.stringify(res).replace(/thisMonth/g, '用户数')
+        let b = JSON.parse(a)
+        this.usersData = b
       })
     })
-    // this.$http.post('/api/soa-system-authority/service/sales/sauserdetail').then(({ data }) => {
-    //   console.log(data)
-    // })
   },
   methods: {
     toIncome () {
